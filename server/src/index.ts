@@ -6,8 +6,12 @@ import { registerHandlers } from './socket/handlers.js'
 
 const PORT = process.env.PORT || 3000
 
+const ALLOWED_ORIGINS = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',').map(o => o.trim())
+  : ['http://localhost:5173']
+
 const app = express()
-app.use(cors())
+app.use(cors({ origin: ALLOWED_ORIGINS }))
 app.use(express.json())
 
 app.get('/health', (_req, res) => {
@@ -17,7 +21,7 @@ app.get('/health', (_req, res) => {
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: ALLOWED_ORIGINS,
     methods: ['GET', 'POST'],
   },
 })
